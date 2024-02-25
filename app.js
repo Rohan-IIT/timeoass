@@ -1,37 +1,46 @@
 const express = require('express')
 const app = express()
 var bodyParser = require('body-parser')
-// parse application/x-www-form-urlencoded
+var path = require('path');
+const port = 3000
+
 app.use(bodyParser.urlencoded({ extended: false }))
-
-// parse application/json
 app.use(bodyParser.json())
-app.get('/amazon/football', (req, res) => {
-    res.send('football page!')
-})
 
-app.post('/a', (req, res) => {
+const todosRepo = require('./src/todosFileRepository');
 
-        var search = req.body.search        
-        if (!isNaN(search)) {
-            throw new Error('bhai thik product ka naam de');
-            res.redirect('/amazon/home');
-        }
-        else res.redirect('/amazon/'+req.body.search)
-})
+/* GET todos listing. */
+app.get('/', function(req, res, next) {
+  const data = todosRepo.findAll();
+  res.send(data);
+});
 
-app.get('/amazon/cycle', (req, res) => {
-    res.send('cycle page!')
-})
+app.post('/add', function(req, res, next) {
+    console.log(req.body);
+    if (req.body.todoText.trim() === '') {
+      res.send('Todo text can not be empty!');
+    } else {
+      todosRepo.create({text: req.body.todoText.trim()});
+      res.redirect('/');
+    }
+  });
 
-app.get('/amazon/home', (req, res) => {
-    res.send('<h1>home page </h1> <form action=/a method=post>    <input name=search>    <button type=submit>Search</button></form>')
-})
 
-var server = app.listen(process.env.PORT || 3000, listen);
+app.put('/:uuid/edit', function(req, res, next) {
+    if (req.body.todoText.trim() === '') {
+      res.send('Todo text can not be empty!');
+    } else {
+      const updatedTodo = {id: req.params.uuid, text: req.body.todoText.trim()};
+      todosRepo.update(updatedTodo);
+      res.redirect('/');
+    }
+});
 
-function listen() {
-  var host = server.address().address;
-  var port = server.address().port;
-  console.log('Example app listening at http://' + host + ':' + port);
-}
+app.delete('/:uuid/delete', function(req, res, next) {
+    todosRepo.deleteById(req.params.uuid);
+    res.redirect('/');
+});
+
+app.listen(port, () => {
+    console.log(`Example app listening on port ${port}`)
+  })
