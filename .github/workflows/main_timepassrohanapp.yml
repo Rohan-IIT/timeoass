@@ -52,5 +52,5 @@ jobs:
         with:
           app-name: 'rohantptp'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_B95F59D592124E55B1B847BD96FDF2EA }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_d3fb5104-7cdb-4ebe-b13e-a0630208bfe1 }}
           package: .
